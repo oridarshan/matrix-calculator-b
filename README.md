@@ -1,5 +1,8 @@
 <div dir="rtl" lang="he">
 
+# צילום מסך של תוצאות:
+![results](https://github.com/oridarshan/matrix-calculator-b/blob/f31e89918f6c522364c74646167d7c9a4c1c54fd/objects/SharedScreenshot.jpg)
+    
 # מחשבון מטריצות - חלק ב
 
 כתבו מחלקה לביצועי חישובים על מטריצות, בהתאם להוראות בחלק א.
