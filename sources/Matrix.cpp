@@ -3,7 +3,7 @@
 #include "Matrix.hpp"
 using namespace zich;
 
-Matrix::Matrix(std::vector<double> values, int row, int col)
+Matrix::Matrix(const std::vector<double> &values, int row, int col)
 {
     if(values.size() != col*row){
         throw ("ERROR! values vector not compatible with required shape");
@@ -21,7 +21,7 @@ std::vector<double> Matrix::operator[](int n){
     return std::vector<double>{values.begin()+col*n, values.begin()+col*(n+1)};
 }
 
-double sum_vector(const std::vector<double> vec){
+double sum_vector(const std::vector<double> &vec){
     double sum = 0;
     for(const double& num : vec){
         sum+=num;
@@ -53,7 +53,7 @@ Matrix Matrix::operator +(const Matrix &mat2)
     for(size_t i=0; i<row*col; i++){
         arr[i] += mat2.values[i];
     }
-    Matrix res{arr, col, row};
+    Matrix res{arr, row, col};
     return res;
 }
 
@@ -99,6 +99,7 @@ Matrix Matrix::operator *(Matrix other){
         for (size_t j = 0; j < new_col; j++)
         {
             double val = 0;
+            // each Cij is the linear combination of the row Ai and column Bj
             for (size_t k = 0; k < col; k++)
             {
                 val += values[((size_t)col*i) + k] * other.values[((size_t)other.col*k)+j];
@@ -109,7 +110,7 @@ Matrix Matrix::operator *(Matrix other){
     Matrix res{arr, row, other.col};
     return res;
 }
-Matrix& Matrix::operator *=(Matrix other)
+Matrix& Matrix::operator *=(const Matrix &other)
 {
     *this = *this * other;
     return *this;
@@ -154,7 +155,7 @@ Matrix zich::operator *(int n, const Matrix &mat)
     for(double &val: copy.values){
         val *= n;
     }
-    return mat;
+    return copy;
 }
 
 bool zich::operator==(const Matrix& mat1, const Matrix& mat2)
@@ -201,13 +202,72 @@ std::ostream& zich::operator<< (std::ostream& output, const Matrix& m){
         res += "[";
         for (size_t j = 0; j < m.col; j++)
         {
-            res += std::to_string(m.values[(size_t)m.col*i+j]);
-            res += " ";
+            // res += std::to_string(m.values[(size_t)m.col*i+j]);
+            res += std::to_string((int)m.values[(size_t)m.col*i+j]);
+            if (j!= m.col-1){res += " ";}
         }
-        res += "]\n";
+        res += "]";
+        if(i != m.row-1){res += "\n";}
     }
     
     return output << res;
 } 
-std::istream& zich::operator>> (std::istream& input , Matrix& m){return input;}
+std::istream& zich::operator>> (std::istream& input , Matrix& m)
+{
+    input >> std::noskipws;
+    std::vector<double> arr;
+    int row = 0;
+    int col = -1;
+    int current_col = 0;
+
+    char current_char = 0;
+    input >> current_char;
+    if (current_char != '[')
+    {
+        throw("ERROR 1! not following required template");
+    }
+    while(current_char != '\n'){
+        arr.push_back((double)current_char);
+        input >> current_char;
+        current_col++;
+        if (current_char == ']')
+        {
+            if(col == -1)
+            {
+                col = current_col;
+            }
+            if(col != current_col)
+            {
+                throw("ERROR! NOT EQUAL LINES");
+            }
+            current_col = 0;
+            input >> current_char;
+            if(current_char == '\n')
+            {
+                row++;
+                break;
+            }
+            if(current_char != ',')
+            {
+                throw("ERROR! WRONG FORMAT");
+            }
+            input >> current_char;
+            if(current_char != ' ')
+            {
+                throw("ERROR3! WRONG FORMAT");
+            }
+            row++;
+
+            input >> current_char;
+            if(current_char != '[')
+            {
+                throw("ERROR 2 WRONG FORMAT");
+            }
+        }
+    }
+    
+    Matrix res{arr, row, col};
+    m = res;
+    return input;
+}
         

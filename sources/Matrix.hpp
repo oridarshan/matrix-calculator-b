@@ -17,7 +17,7 @@ namespace zich
         int row;
 
     public:
-        Matrix(std::vector<double> values, int col, int row);
+        Matrix(const std::vector<double> &values, int row, int col);
         ~Matrix();
         Matrix operator -() const;
         Matrix operator +();
@@ -33,7 +33,7 @@ namespace zich
 
         // matrix mltiplication
         Matrix operator *(Matrix other);
-        Matrix& operator *=(Matrix other);
+        Matrix& operator *=(const Matrix &other);
 
         // change self
         Matrix& operator ++();
@@ -56,8 +56,8 @@ namespace zich
 
         friend void check_dimentions(const Matrix &mat1, const Matrix &mat2);
 
-        friend std::ostream& operator<< (std::ostream& output, const Matrix& c);
-        friend std::istream& operator>> (std::istream& input , Matrix& c);
+        friend std::ostream& operator<< (std::ostream& output, const Matrix& m);
+        friend std::istream& operator>> (std::istream& input , Matrix& m);
         
     };
     
